@@ -17,7 +17,6 @@ package cmd
 
 import (
     "context"
-    "encoding/json"
 	"fmt"
     "log"
     "os"
@@ -27,6 +26,7 @@ import (
 
     pb "github.com/openinfradev/tks-proto/tks_pb"
 	"github.com/spf13/cobra"
+    "google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
@@ -71,11 +71,13 @@ tksadmin contract create <CONTRACT NAME>`,
         data[0].Quota = quota
         data[0].AvailableServices = []string{"LMA", "SERVICE_MESH"}
         data[0].CspName = "test"
-        //data[0].CspAuth = "test"
-        doc, _ := json.Marshal(data[0])
-        fmt.Println("Json data...")
-        fmt.Println(string(doc))
-
+        m := protojson.MarshalOptions{
+            Indent:        "  ",
+            UseProtoNames: true,
+        }
+        jsonBytes, _ := m.Marshal(&data[0])
+        fmt.Println("Proto Json data...")
+        fmt.Println(string(jsonBytes))
         r, err := client.CreateContract(ctx, &data[0])
         fmt.Println(r)        
 	},
