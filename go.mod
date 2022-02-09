@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/matryer/is v1.4.0
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/openinfradev/tks-proto v0.0.0-20210924020717-178698d59e9d
 	github.com/pelletier/go-toml v1.9.4 // indirect
