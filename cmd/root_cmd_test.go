@@ -30,7 +30,32 @@ func execute(t *testing.T, c *cobra.Command, args ...string) (string, error) {
 	return strings.TrimSpace(buf.String()), err
 }
 
-func TestSubCmd(t *testing.T) {
+func TestContractCmd(t *testing.T) {
+	is := is.New(t)
+
+	testcases := []struct {
+		args      []string
+		out_check bool
+		err       error
+		out       string
+	}{
+		{[]string{"contract"}, true, nil, ""},
+		// {[]string{"contract", "create"}, false, nil, ""},	# It generates Exit(1) and the FAILed test
+		{[]string{"contract", "create", "cli-unit-test"}, true, nil, ""},
+	}
+
+	for _, tc := range testcases {
+		out, err := execute(t, rootCmd, tc.args...)
+
+		is.Equal(tc.err, err)
+
+		if tc.err == nil && tc.out_check {
+			is.Equal(tc.out, out)
+		}
+	}
+}
+
+func TestOtherCmd(t *testing.T) {
 	is := is.New(t)
 
 	testcases := []struct {
@@ -56,10 +81,6 @@ func TestSubCmd(t *testing.T) {
 			out:       "",
 		},
 		{[]string{"-t"}, false, nil, ""},
-
-		{[]string{"contract"}, true, nil, ""},
-		// {[]string{"contract", "create"}, false, nil, ""},	# It generates Exit(1) and the FAILed test
-		{[]string{"contract", "create", "cli-unit-test"}, true, nil, ""},
 	}
 
 	for _, tc := range testcases {
