@@ -72,7 +72,7 @@ tksadmin contract create <CONTRACT NAME>`,
 		quota.FsSsd = 0
 		data[0].Quota = quota
 		data[0].AvailableServices = []string{"LMA", "SERVICE_MESH"}
-		data[0].CspName = "test"
+		data[0].CspName = "aws"
 		m := protojson.MarshalOptions{
 			Indent:        "  ",
 			UseProtoNames: true,
