@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 SK Telecom <https://github.com/openinfradev>
+Copyright © 2022 SK Telecom <https://github.com/openinfradev>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,70 +16,72 @@ limitations under the License.
 package cmd
 
 import (
-    "context"
+	"context"
 	"fmt"
-    "log"
-    "os"
-    "time"
+	"log"
+	"os"
+	"time"
 
-    "google.golang.org/grpc"
+	"google.golang.org/grpc"
 
-    pb "github.com/openinfradev/tks-proto/tks_pb"
+	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"github.com/spf13/cobra"
-    "google.golang.org/protobuf/encoding/protojson"
-)
-
-const (
-    address     = "tks-contract.taco-cat.xyz:9110"
+	"github.com/spf13/viper"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create a TACO Contract",
-	Long: `Create a TACO Contract
+	Short: "Create a TKS Contract",
+	Long: `Create a TKS Contract
 
 Example:
 tksadmin contract create <CONTRACT NAME>`,
 	Run: func(cmd *cobra.Command, args []string) {
-        if len(args) == 0 {
-            fmt.Println("You must specify contract name.")
-            fmt.Println("Usage: tksadmin contract create <CONTRACT NAME>")
-            os.Exit(1)
-        }
+		if len(args) == 0 {
+			fmt.Println("You must specify contract name.")
+			fmt.Println("Usage: tksadmin contract create <CONTRACT NAME>")
+			os.Exit(1)
+		}
 		fmt.Println("Contract Name: ", args[0])
-        var conn *grpc.ClientConn
-        conn, err := grpc.Dial(address, grpc.WithInsecure())
-        if err != nil {
-            log.Fatalf("did not connect: %s", err)
-        }
-        defer conn.Close()
+		var conn *grpc.ClientConn
+		tksContractUrl = viper.GetString("tksContractUrl")
+		if tksContractUrl == "" {
+			fmt.Println("You must specify tksContractUrl at config file")
+			os.Exit(1)
+		}
+		conn, err := grpc.Dial(tksContractUrl, grpc.WithInsecure())
+		if err != nil {
+			log.Fatalf("did not connect: %s", err)
+		}
+		defer conn.Close()
 
-        client := pb.NewContractServiceClient(conn)
-        ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-        defer cancel()
-        data := make([]pb.CreateContractRequest, 1)
-        quota := &pb.ContractQuota{}
-        data[0].ContractorName = args[0]
-        //TODO: this quota is dummy, so quota feature is required
-        quota.Cpu = 1200
-        quota.Memory = 1200
-        quota.Block = 1200
-        quota.BlockSsd = 0
-        quota.Fs = 0
-        quota.FsSsd = 0
-        data[0].Quota = quota
-        data[0].AvailableServices = []string{"LMA", "SERVICE_MESH"}
-        data[0].CspName = "test"
-        m := protojson.MarshalOptions{
-            Indent:        "  ",
-            UseProtoNames: true,
-        }
-        jsonBytes, _ := m.Marshal(&data[0])
-        fmt.Println("Proto Json data...")
-        fmt.Println(string(jsonBytes))
-        r, err := client.CreateContract(ctx, &data[0])
-        fmt.Println(r)        
+		client := pb.NewContractServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		data := make([]pb.CreateContractRequest, 1)
+		quota := &pb.ContractQuota{}
+		data[0].ContractorName = args[0]
+		//TODO: this quota is dummy, so quota feature is required
+		quota.Cpu = 1200
+		quota.Memory = 1200
+		quota.Block = 1200
+		quota.BlockSsd = 0
+		quota.Fs = 0
+		quota.FsSsd = 0
+		data[0].Quota = quota
+		data[0].AvailableServices = []string{"LMA", "SERVICE_MESH"}
+		data[0].CspName = "test"
+		m := protojson.MarshalOptions{
+			Indent:        "  ",
+			UseProtoNames: true,
+		}
+		jsonBytes, _ := m.Marshal(&data[0])
+		fmt.Println("Proto Json data...")
+		fmt.Println(string(jsonBytes))
+		r, err := client.CreateContract(ctx, &data[0])
+		fmt.Println(r)
 	},
 }
 

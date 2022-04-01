@@ -24,8 +24,8 @@ import (
 // contractCmd represents the contract command
 var contractCmd = &cobra.Command{
 	Use:   "contract",
-	Short: "Operation for TACO Contract",
-	Long: `Operation for TACO Contract`,
+	Short: "Operation for TKS Contract",
+	Long:  `Operation for TKS Contract`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("contract called")
 	},
