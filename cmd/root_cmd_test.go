@@ -59,8 +59,8 @@ func doTest(t *testing.T, testcases []Testcase) {
 func TestContractCmd(t *testing.T) {
 	testcases := []Testcase{
 		{[]string{"contract"}, true, "", ""},
-		// {[]string{"contract", "create"}, false, "", ""},	// It generates Exit(1) and the FAILed test
-		// {[]string{"contract", "create", "cli-unit-test"}, true, "Contract Name:  cli-unit-test\nYou must specify tksContractUrl at config file", ""}, // It generates Exit(1) and the FAILed test
+		{[]string{"contract", "create"}, true, "Usage: tksadmin contract create <CONTRACT NAME>", ""},
+		{[]string{"contract", "create", "cli-unit-test"}, true, "Contract Name:  cli-unit-test\nYou must specify tksContractUrl at config file", ""},
 	}
 
 	doTest(t, testcases)

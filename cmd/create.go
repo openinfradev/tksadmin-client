@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -38,18 +38,17 @@ var createCmd = &cobra.Command{
 
 Example:
 tksadmin contract create <CONTRACT NAME>`,
-	Run: func(cmd *cobra.Command, args []string) {
+	SilenceUsage: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			fmt.Println("You must specify contract name.")
-			fmt.Println("Usage: tksadmin contract create <CONTRACT NAME>")
-			os.Exit(1)
+			return errors.New("Usage: tksadmin contract create <CONTRACT NAME>")
 		}
 		fmt.Println("Contract Name: ", args[0])
 		var conn *grpc.ClientConn
 		tksContractUrl = viper.GetString("tksContractUrl")
 		if tksContractUrl == "" {
-			fmt.Println("You must specify tksContractUrl at config file")
-			os.Exit(1)
+			return errors.New("You must specify tksContractUrl at config file")
 		}
 		conn, err := grpc.Dial(tksContractUrl, grpc.WithInsecure())
 		if err != nil {
@@ -81,7 +80,13 @@ tksadmin contract create <CONTRACT NAME>`,
 		fmt.Println("Proto Json data...")
 		fmt.Println(string(jsonBytes))
 		r, err := client.CreateContract(ctx, &data[0])
-		fmt.Println(r)
+		if err != nil {
+			return fmt.Errorf("Error: %s", err)
+		} else {
+			fmt.Println("Success: The request to create contract ", args[0], " was accepted.")
+			fmt.Print(r)
+		}
+		return nil
 	},
 }
 
