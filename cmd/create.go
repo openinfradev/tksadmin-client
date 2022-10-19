@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,6 +59,10 @@ tksadmin contract create <CONTRACT NAME>`,
 		client := pb.NewContractServiceClient(conn)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
+
+		creator, _ := cmd.Flags().GetString("creator")
+		description, _ := cmd.Flags().GetString("description")
+
 		data := make([]pb.CreateContractRequest, 1)
 		quota := &pb.ContractQuota{}
 		data[0].ContractorName = args[0]
@@ -72,6 +76,8 @@ tksadmin contract create <CONTRACT NAME>`,
 		data[0].Quota = quota
 		data[0].AvailableServices = []string{"LMA", "SERVICE_MESH"}
 		data[0].CspName = "aws"
+		data[0].Creator = creator
+		data[0].Description = description
 		m := protojson.MarshalOptions{
 			Indent:        "  ",
 			UseProtoNames: true,
@@ -102,4 +108,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	createCmd.Flags().String("creator", "", "Uuid of creator")
+	createCmd.Flags().String("description", "", "Description of cluster")
+
 }
